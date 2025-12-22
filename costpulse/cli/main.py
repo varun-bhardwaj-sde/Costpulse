@@ -3,6 +3,7 @@
 import asyncio
 import csv
 import json
+import os
 import sys
 import time
 from typing import List, Dict, Any
@@ -34,13 +35,25 @@ def init() -> None:
 
     console.print("[bold green]CostPulse Configuration[/bold green]\n")
 
+    # Check if .env exists and warn before overwriting
+    if os.path.exists(".env"):
+        if not click.confirm(
+            ".env file already exists. Overwrite?", default=False
+        ):
+            console.print("[yellow]Configuration initialization cancelled.[/yellow]")
+            return
+
     host = click.prompt("Databricks Host URL", default=settings.databricks.host or "")
     token = click.prompt("Databricks Token", hide_input=True)
 
     # Save to .env file
-    with open(".env", "w") as f:
-        f.write(f"DATABRICKS_HOST={host}\n")
-        f.write(f"DATABRICKS_TOKEN={token}\n")
+    try:
+        with open(".env", "w") as f:
+            f.write(f"DATABRICKS_HOST={host}\n")
+            f.write(f"DATABRICKS_TOKEN={token}\n")
+    except IOError as e:
+        console.print(f"[red]Failed to write .env file: {e}[/red]")
+        return
 
     console.print("\n[green]✓ Configuration saved to .env[/green]")
 
@@ -61,7 +74,6 @@ def query() -> None:
 )
 def today(format: str) -> None:
     """Get today's costs."""
-    import asyncio
     from costpulse.collectors.system_tables import SystemTablesCollector
     from costpulse.core.config import settings
 

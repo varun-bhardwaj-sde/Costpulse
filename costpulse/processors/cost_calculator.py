@@ -1,9 +1,12 @@
 """Calculate costs from DBU usage."""
 
+import structlog
 from decimal import Decimal
 from typing import Dict, Optional
 
 from costpulse.core.constants import DBU_RATES, VM_COSTS
+
+logger = structlog.get_logger()
 
 
 class CostCalculator:
@@ -38,6 +41,13 @@ class CostCalculator:
             if photon_sku in self.rates:
                 sku_name = photon_sku
 
+        # Get rate with warning for unknown SKUs
+        if sku_name not in self.rates:
+            logger.warning(
+                "Unknown SKU using fallback rate",
+                sku=sku_name,
+                fallback_rate=0.15
+            )
         rate = Decimal(str(self.rates.get(sku_name, 0.15)))
         count = Decimal(str(dbu_count))
 

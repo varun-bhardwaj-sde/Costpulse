@@ -63,18 +63,18 @@ class BaseCollector(ABC):
         Returns:
             List of transformed data records
         """
-        logger.info(f"Starting collection", collector=self.__class__.__name__)
+        logger.info("Starting collection", collector=self.__class__.__name__)
         try:
             raw_data = await self.collect()
             transformed = await self.transform(raw_data)
             logger.info(
-                f"Collection complete",
+                "Collection complete",
                 collector=self.__class__.__name__,
                 records=len(transformed),
             )
             return transformed
         except Exception as e:
             logger.error(
-                f"Collection failed", collector=self.__class__.__name__, error=str(e)
+                "Collection failed", collector=self.__class__.__name__, error=str(e)
             )
             raise

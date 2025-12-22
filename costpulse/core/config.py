@@ -9,9 +9,9 @@ from pydantic_settings import BaseSettings
 class DatabricksConfig(BaseSettings):
     """Databricks connection configuration."""
 
-    host: str = Field(..., env="DATABRICKS_HOST")
-    token: str = Field(..., env="DATABRICKS_TOKEN")
-    account_id: Optional[str] = Field(None, env="DATABRICKS_ACCOUNT_ID")
+    host: str = Field(...)
+    token: str = Field(...)
+    account_id: Optional[str] = Field(None)
 
     class Config:
         """Pydantic configuration."""

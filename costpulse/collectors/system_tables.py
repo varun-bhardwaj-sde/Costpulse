@@ -56,7 +56,7 @@ class SystemTablesCollector(BaseCollector):
             return []
 
         except Exception as e:
-            logger.error(f"Failed to query system tables", error=str(e))
+            logger.error("Failed to query system tables", error=str(e))
             raise
 
     def _get_sql_warehouse_id(self) -> str:
@@ -92,7 +92,16 @@ class SystemTablesCollector(BaseCollector):
         for row in data:
             sku = row.get("sku_name", "UNKNOWN")
             dbu_count = float(row.get("usage_quantity", 0))
-            dbu_rate = DBU_RATES.get(sku, 0.15)  # Default rate
+
+            # Get DBU rate, warn if unknown SKU
+            dbu_rate = DBU_RATES.get(sku)
+            if dbu_rate is None:
+                logger.warning(
+                    "Unknown SKU using default rate",
+                    sku=sku,
+                    default_rate=0.15
+                )
+                dbu_rate = 0.15  # Default to STANDARD_JOBS_COMPUTE rate
 
             transformed.append(
                 {
