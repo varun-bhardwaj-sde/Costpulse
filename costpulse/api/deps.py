@@ -9,9 +9,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from costpulse.models.base import async_session_factory
 
-API_SECRET_KEY = os.environ.get("API_SECRET_KEY")
-if not API_SECRET_KEY:
-    raise RuntimeError("API_SECRET_KEY environment variable must be set")
+
+def _get_api_secret_key() -> str:
+    """Get API secret key from environment, raising if unset."""
+    key = os.environ.get("API_SECRET_KEY")
+    if not key:
+        raise RuntimeError("API_SECRET_KEY environment variable must be set")
+    return key
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
@@ -27,7 +31,8 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 async def verify_api_key(x_api_key: Optional[str] = Header(default=None)) -> str:
     """Verify API key from request header."""
-    if not x_api_key or not secrets.compare_digest(x_api_key, API_SECRET_KEY):
+    api_secret = _get_api_secret_key()
+    if not x_api_key or not secrets.compare_digest(x_api_key, api_secret):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or missing API key",

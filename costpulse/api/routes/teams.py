@@ -34,9 +34,7 @@ class TeamMemberCreate(BaseModel):
 @router.get("/")
 async def list_teams(db: AsyncSession = Depends(get_db)):
     """List all teams."""
-    result = await db.execute(
-        select(Team).options(selectinload(Team.members)).order_by(Team.name)
-    )
+    result = await db.execute(select(Team).options(selectinload(Team.members)).order_by(Team.name))
     teams = result.scalars().all()
     return {
         "data": [
