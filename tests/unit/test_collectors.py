@@ -6,9 +6,9 @@ from unittest.mock import MagicMock
 # Mock out the databricks SDK modules before any collector imports
 _mock_sdk = MagicMock()
 _mock_config = MagicMock()
-sys.modules.setdefault("databricks", _mock_sdk)
-sys.modules.setdefault("databricks.sdk", _mock_sdk)
-sys.modules.setdefault("databricks.sdk.config", _mock_config)
+sys.modules["databricks"] = _mock_sdk
+sys.modules["databricks.sdk"] = _mock_sdk
+sys.modules["databricks.sdk.config"] = _mock_config
 
 from datetime import datetime, timezone  # noqa: E402
 

@@ -81,7 +81,7 @@ export function CostPieChart({ data, title }: PieProps) {
               color: "#f8fafc",
             }}
             formatter={(value: number) => [
-              `$${value.toLocaleString()} (${((value / total) * 100).toFixed(1)}%)`,
+              `$${value.toLocaleString()} (${total > 0 ? ((value / total) * 100).toFixed(1) : "0.0"}%)`,
               "Cost",
             ]}
           />

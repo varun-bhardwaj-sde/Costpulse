@@ -1,6 +1,6 @@
 """Recommendation service for idle cluster detection and right-sizing."""
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import structlog
 from sqlalchemy import select
@@ -254,7 +254,7 @@ class RecommendationService:
     async def list_recommendations(
         self,
         status: str = "open",
-        recommendation_type: str = None,
+        recommendation_type: Optional[str] = None,
         limit: int = 50,
     ) -> List[Recommendation]:
         """List recommendations with optional filters."""
@@ -266,7 +266,7 @@ class RecommendationService:
         result = await self.session.execute(query)
         return list(result.scalars().all())
 
-    async def update_recommendation_status(self, rec_id, status: str) -> Recommendation | None:
+    async def update_recommendation_status(self, rec_id: str, status: str) -> Recommendation | None:
         """Update recommendation status (e.g., accepted, dismissed)."""
         result = await self.session.execute(
             select(Recommendation).where(Recommendation.id == rec_id)

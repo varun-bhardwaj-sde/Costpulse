@@ -1,7 +1,7 @@
 """FastAPI dependencies for database sessions and authentication."""
 
 import os
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Optional
 
 from fastapi import Header, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,7 +22,7 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
             raise
 
 
-async def verify_api_key(x_api_key: str = Header(default=None)) -> str:
+async def verify_api_key(x_api_key: Optional[str] = Header(default=None)) -> str:
     """Verify API key from request header."""
     if not x_api_key or x_api_key != API_SECRET_KEY:
         raise HTTPException(

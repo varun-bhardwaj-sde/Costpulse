@@ -128,7 +128,7 @@ async def add_team_member(
     if not result.scalar_one_or_none():
         raise HTTPException(status_code=404, detail="Team not found")
 
-    member = TeamMember(team_id=team_id, **data.model_dump())
+    member = TeamMember(team_id=team_id, **data.model_dump(exclude_none=True))
     db.add(member)
     await db.flush()
     return {"id": str(member.id), "email": member.email}

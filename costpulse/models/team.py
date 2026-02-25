@@ -2,6 +2,7 @@
 
 import uuid
 from datetime import datetime
+from typing import Optional
 
 from sqlalchemy import DateTime, ForeignKey, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB, UUID
@@ -17,10 +18,10 @@ class Team(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
-    department: Mapped[str] = mapped_column(String(255), nullable=True)
-    cost_center: Mapped[str] = mapped_column(String(100), nullable=True)
-    manager_email: Mapped[str] = mapped_column(String(255), nullable=True)
-    description: Mapped[str] = mapped_column(Text, nullable=True)
+    department: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    cost_center: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    manager_email: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     tag_patterns: Mapped[dict] = mapped_column(JSONB, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
@@ -44,9 +45,9 @@ class TeamMember(Base):
         UUID(as_uuid=True), ForeignKey("teams.id", ondelete="CASCADE"), nullable=False
     )
     email: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
-    display_name: Mapped[str] = mapped_column(String(255), nullable=True)
+    display_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     role: Mapped[str] = mapped_column(String(100), default="member")  # member, lead, admin
-    databricks_user_id: Mapped[str] = mapped_column(String(255), nullable=True)
+    databricks_user_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships

@@ -86,14 +86,14 @@ class UserCollector(BaseCollector):
         users_map: Dict[str, Dict[str, Any]] = {}
 
         for record in data:
-            if record["type"] == "user":
+            if record["type"] == "user" and record.get("id"):
                 users_map[record["id"]] = {
                     "email": record["user_name"],
                     "display_name": record["display_name"],
                     "databricks_user_id": record["id"],
                     "groups": record.get("groups", []),
                 }
-            elif record["type"] == "group":
+            elif record["type"] == "group" and record.get("display_name"):
                 groups_map[record["display_name"]] = record.get("members", [])
 
         # Build teams from groups

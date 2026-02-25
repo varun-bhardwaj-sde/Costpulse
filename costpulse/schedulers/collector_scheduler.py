@@ -97,6 +97,8 @@ async def run_analysis_cycle():
 
 async def scheduler_loop():
     """Main scheduler loop — runs collection and analysis periodically."""
+    if settings.polling_interval <= 0:
+        raise ValueError(f"polling_interval must be positive, got {settings.polling_interval}")
     interval = settings.polling_interval * 60  # Convert to seconds (default: 30 min)
     logger.info("Scheduler started", interval_minutes=settings.polling_interval)
 

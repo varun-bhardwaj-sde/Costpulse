@@ -4,6 +4,7 @@ from typing import Optional
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from sqlalchemy.engine import URL
 
 
 class DatabricksConfig(BaseSettings):
@@ -30,7 +31,16 @@ class DatabaseConfig(BaseSettings):
     @property
     def url(self) -> str:
         """Get SQLAlchemy database URL."""
-        return f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.database}"
+        return str(
+            URL.create(
+                drivername="postgresql+asyncpg",
+                username=self.user,
+                password=self.password,
+                host=self.host,
+                port=self.port,
+                database=self.database,
+            )
+        )
 
 
 class RedisConfig(BaseSettings):

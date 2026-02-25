@@ -46,6 +46,7 @@ class TestCostRecordModel:
         index_names = {idx.name for idx in CostRecord.__table__.indexes}
         assert "ix_cost_records_date_workspace" in index_names
         assert "ix_cost_records_date_sku" in index_names
+        assert "ix_cost_records_user_date" in index_names
 
 
 class TestTeamModel:

@@ -1,4 +1,4 @@
-import { Routes, Route, NavLink } from "react-router-dom";
+import { Routes, Route, NavLink, Navigate } from "react-router-dom";
 import {
   LayoutDashboard,
   DollarSign,
@@ -8,8 +8,6 @@ import {
   FileText,
   Lightbulb,
   TrendingUp,
-  Tag,
-  Building2,
 } from "lucide-react";
 import Dashboard from "./pages/Dashboard";
 import CostsPage from "./pages/CostsPage";
@@ -89,6 +87,7 @@ function App() {
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/recommendations" element={<RecommendationsPage />} />
           <Route path="/forecast" element={<ForecastPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
     </div>

@@ -46,7 +46,7 @@ class WarehouseCollector(BaseCollector):
                             wh.num_active_sessions if hasattr(wh, "num_active_sessions") else 0
                         ),
                         "num_clusters": wh.num_clusters if hasattr(wh, "num_clusters") else 0,
-                        "tags": {},
+                        "tags": self._extract_tags(wh),
                     }
                 )
 
@@ -55,6 +55,18 @@ class WarehouseCollector(BaseCollector):
         except Exception as e:
             logger.error("Failed to collect warehouses", error=str(e))
             raise
+
+    @staticmethod
+    def _extract_tags(wh) -> Dict[str, str]:
+        """Extract custom tags from a warehouse object."""
+        try:
+            if hasattr(wh, "tags") and wh.tags:
+                custom = getattr(wh.tags, "custom_tags", None)
+                if custom:
+                    return {t.key: t.value for t in custom}
+        except Exception:
+            pass
+        return {}
 
     async def transform(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Transform warehouse data into standardized format.

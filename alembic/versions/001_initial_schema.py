@@ -38,9 +38,10 @@ def upgrade() -> None:
     )
 
     # Cost Records (will be converted to hypertable)
+    # TimescaleDB requires the partitioning column in all unique/PK constraints
     op.create_table(
         "cost_records",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
+        sa.Column("id", postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column("usage_date", sa.DateTime(timezone=True), nullable=False, index=True),
         sa.Column("workspace_id", sa.String(255), nullable=False, index=True),
         sa.Column("sku_name", sa.String(255), nullable=False, index=True),
@@ -58,6 +59,7 @@ def upgrade() -> None:
         sa.Column("tags", postgresql.JSONB, server_default="{}"),
         sa.Column("metadata", postgresql.JSONB, server_default="{}"),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
+        sa.PrimaryKeyConstraint("id", "usage_date"),
     )
     op.create_index("ix_cost_records_date_workspace", "cost_records", ["usage_date", "workspace_id"])
     op.create_index("ix_cost_records_date_sku", "cost_records", ["usage_date", "sku_name"])
@@ -138,7 +140,11 @@ def upgrade() -> None:
         sa.Column("compute_cost", sa.Float, nullable=False, server_default="0"),
         sa.Column("storage_cost", sa.Float, nullable=False, server_default="0"),
         sa.Column("breakdown", postgresql.JSONB, server_default="{}"),
-        sa.Column("rule_id", postgresql.UUID(as_uuid=True)),
+        sa.Column(
+            "rule_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("allocation_rules.id", ondelete="SET NULL"),
+        ),
         sa.Column("allocation_method", sa.String(50), server_default="rule_based"),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
     )

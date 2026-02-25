@@ -15,10 +15,13 @@ interface Props {
 }
 
 export default function CostTrendChart({ data, title }: Props) {
-  const formatted = data.map((d) => ({
-    ...d,
-    date: new Date(d.period).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-  }));
+  const formatted = data.map((d) => {
+    const parsed = new Date(d.period);
+    const label = isNaN(parsed.getTime())
+      ? d.period
+      : parsed.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    return { ...d, date: label };
+  });
 
   return (
     <div className="card full-width">
