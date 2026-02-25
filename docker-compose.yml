@@ -35,6 +35,36 @@ services:
     networks:
       - costpulse-network
 
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: costpulse-api
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - costpulse-network
+    command: uvicorn costpulse.api.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: costpulse-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    networks:
+      - costpulse-network
+
 volumes:
   timescale_data:
   redis_data:
