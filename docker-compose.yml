@@ -39,8 +39,7 @@ services:
       dockerfile: Dockerfile
     container_name: costpulse-api
     env_file:
-      - path: .env
-        required: false
+      - .env 
     environment:
       # Shell env and .env values take precedence over these defaults
       TIMESCALE_HOST: ${TIMESCALE_HOST:-timescaledb}
