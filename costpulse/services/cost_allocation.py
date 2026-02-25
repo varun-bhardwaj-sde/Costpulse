@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 import structlog
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from costpulse.models.allocation import AllocationRule, CostAllocation
@@ -95,6 +95,14 @@ class CostAllocationService:
                 unallocated.append(record)
 
         # Persist allocations
+        # Keep allocations idempotent for the same exact period
+        await self.session.execute(
+            delete(CostAllocation).where(
+                CostAllocation.period_start == period_start,
+                CostAllocation.period_end == period_end,
+            )
+        )
+
         results = []
         for team_id, data in allocations.items():
             allocation = CostAllocation(

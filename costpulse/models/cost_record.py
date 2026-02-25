@@ -3,7 +3,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, Float, Index, String, func
+from sqlalchemy import DateTime, Float, Index, String, func, text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -32,8 +32,12 @@ class CostRecord(Base):
     job_name: Mapped[str] = mapped_column(String(255), nullable=True)
     warehouse_id: Mapped[str] = mapped_column(String(255), nullable=True)
     user_email: Mapped[str] = mapped_column(String(255), nullable=True, index=True)
-    tags: Mapped[dict] = mapped_column(JSONB, default=dict)
-    metadata_: Mapped[dict] = mapped_column("metadata", JSONB, default=dict)
+    tags: Mapped[dict] = mapped_column(
+        JSONB, nullable=False, default=dict, server_default=text("'{}'::jsonb")
+    )
+    metadata_: Mapped[dict] = mapped_column(
+        "metadata", JSONB, nullable=False, default=dict, server_default=text("'{}'::jsonb")
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     __table_args__ = (

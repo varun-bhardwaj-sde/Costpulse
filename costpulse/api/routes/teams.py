@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from costpulse.api.deps import get_db
 from costpulse.models.team import Team, TeamMember
@@ -33,7 +34,9 @@ class TeamMemberCreate(BaseModel):
 @router.get("/")
 async def list_teams(db: AsyncSession = Depends(get_db)):
     """List all teams."""
-    result = await db.execute(select(Team).order_by(Team.name))
+    result = await db.execute(
+        select(Team).options(selectinload(Team.members)).order_by(Team.name)
+    )
     teams = result.scalars().all()
     return {
         "data": [
@@ -67,7 +70,9 @@ async def create_team(data: TeamCreate, db: AsyncSession = Depends(get_db)):
 @router.get("/{team_id}")
 async def get_team(team_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
     """Get team details with members."""
-    result = await db.execute(select(Team).where(Team.id == team_id))
+    result = await db.execute(
+        select(Team).options(selectinload(Team.members)).where(Team.id == team_id)
+    )
     team = result.scalar_one_or_none()
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
