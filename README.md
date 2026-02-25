@@ -39,7 +39,7 @@ CostPulse is an open-source FinOps platform built specifically for Databricks cu
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/vrahad-analytics/costpulse.git
+git clone https://github.com/aviral-bhardwaj/Costpulse.git
 cd costpulse
 pip install -e .
 ```
@@ -247,8 +247,8 @@ Apache License 2.0 -- see [LICENSE](LICENSE) for details.
 
 ## Support
 
-- Issues: [GitHub Issues](https://github.com/vrahad-analytics/costpulse/issues)
-- Discussions: [GitHub Discussions](https://github.com/vrahad-analytics/costpulse/discussions)
+- Issues: [GitHub Issues](https://github.com/aviral-bhardwaj/Costpulse/issues)
+- Discussions: [GitHub Discussions](https://github.com/aviral-bhardwaj/Costpulse/costpulse/discussions)
 - Email: contact@vrahad.com
 
 ---
