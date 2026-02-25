@@ -38,7 +38,7 @@ export default function RecommendationsPage() {
 
       <div className="stat-grid">
         <div className="stat-card">
-          <div className="label">Open Recommendations</div>
+          <div className="label">{filter.charAt(0).toUpperCase() + filter.slice(1)} Recommendations</div>
           <div className="value">{recs.length}</div>
         </div>
         <div className="stat-card">

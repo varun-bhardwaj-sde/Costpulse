@@ -3,7 +3,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, Float, String, Text, func
+from sqlalchemy import DateTime, Numeric, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -27,8 +27,8 @@ class Recommendation(Base):
     workspace_id: Mapped[str] = mapped_column(String(255), nullable=True, index=True)
     resource_id: Mapped[str] = mapped_column(String(255), nullable=True)
     resource_type: Mapped[str] = mapped_column(String(50), nullable=True)  # cluster, job, warehouse
-    current_cost: Mapped[float] = mapped_column(Float, nullable=True)
-    estimated_savings: Mapped[float] = mapped_column(Float, nullable=True)
+    current_cost: Mapped[float] = mapped_column(Numeric(18, 6), nullable=True)
+    estimated_savings: Mapped[float] = mapped_column(Numeric(18, 6), nullable=True)
     details: Mapped[dict] = mapped_column(JSONB, default=dict)
     status: Mapped[str] = mapped_column(
         String(50), default="open"

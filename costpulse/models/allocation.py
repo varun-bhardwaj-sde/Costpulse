@@ -3,7 +3,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, Float, ForeignKey, String, Text, func
+from sqlalchemy import DateTime, ForeignKey, Numeric, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -49,10 +49,10 @@ class CostAllocation(Base):
         DateTime(timezone=True), nullable=False, index=True
     )
     period_end: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    total_cost: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
-    dbu_cost: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
-    compute_cost: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
-    storage_cost: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    total_cost: Mapped[float] = mapped_column(Numeric(18, 6), nullable=False, default=0.0)
+    dbu_cost: Mapped[float] = mapped_column(Numeric(18, 6), nullable=False, default=0.0)
+    compute_cost: Mapped[float] = mapped_column(Numeric(18, 6), nullable=False, default=0.0)
+    storage_cost: Mapped[float] = mapped_column(Numeric(18, 6), nullable=False, default=0.0)
     breakdown: Mapped[dict] = mapped_column(JSONB, default=dict)
     rule_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=True)
     allocation_method: Mapped[str] = mapped_column(String(50), default="rule_based")

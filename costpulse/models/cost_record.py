@@ -3,7 +3,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, Float, Index, String, func, text
+from sqlalchemy import DateTime, Index, Numeric, String, func, text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -23,9 +23,9 @@ class CostRecord(Base):
     sku_name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     cloud: Mapped[str] = mapped_column(String(50), nullable=True)
     usage_unit: Mapped[str] = mapped_column(String(50), default="DBU")
-    dbu_count: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
-    dbu_rate: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
-    cost_usd: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    dbu_count: Mapped[float] = mapped_column(Numeric(18, 6), nullable=False, default=0.0)
+    dbu_rate: Mapped[float] = mapped_column(Numeric(18, 6), nullable=False, default=0.0)
+    cost_usd: Mapped[float] = mapped_column(Numeric(18, 6), nullable=False, default=0.0)
     cluster_id: Mapped[str] = mapped_column(String(255), nullable=True, index=True)
     cluster_name: Mapped[str] = mapped_column(String(255), nullable=True)
     job_id: Mapped[str] = mapped_column(String(255), nullable=True, index=True)

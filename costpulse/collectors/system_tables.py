@@ -43,16 +43,15 @@ class SystemTablesCollector(BaseCollector):
                 wait_timeout="30s",
             )
 
-            if result.result and result.result.data_array:
-                return [
-                    dict(
-                        zip(
-                            [col.name for col in result.manifest.schema.columns],
-                            row,
-                        )
-                    )
-                    for row in result.result.data_array
-                ]
+            if (
+                result.result
+                and result.result.data_array
+                and result.manifest
+                and result.manifest.schema
+                and result.manifest.schema.columns
+            ):
+                col_names = [col.name for col in result.manifest.schema.columns]
+                return [dict(zip(col_names, row)) for row in result.result.data_array]
             return []
 
         except Exception as e:
@@ -73,9 +72,12 @@ class SystemTablesCollector(BaseCollector):
             raise ValueError("No SQL warehouses available")
         # Prefer serverless
         for wh in warehouses:
-            if wh.warehouse_type and "SERVERLESS" in wh.warehouse_type.value:
+            if wh.warehouse_type and "SERVERLESS" in wh.warehouse_type.value and wh.id:
                 return wh.id
-        return warehouses[0].id
+        first_id = warehouses[0].id
+        if not first_id:
+            raise ValueError("SQL warehouse has no ID")
+        return first_id
 
     async def transform(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Transform billing data to standardized format.

@@ -3,7 +3,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Float, Integer, String, func
+from sqlalchemy import Boolean, DateTime, Float, Integer, Numeric, String, func
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -32,8 +32,8 @@ class ClusterInfo(Base):
     auto_termination_minutes: Mapped[int] = mapped_column(Integer, nullable=True)
     avg_cpu_utilization: Mapped[float] = mapped_column(Float, nullable=True)
     avg_memory_utilization: Mapped[float] = mapped_column(Float, nullable=True)
-    total_dbu_consumed: Mapped[float] = mapped_column(Float, default=0.0)
-    total_cost_usd: Mapped[float] = mapped_column(Float, default=0.0)
+    total_dbu_consumed: Mapped[float] = mapped_column(Numeric(18, 6), default=0.0)
+    total_cost_usd: Mapped[float] = mapped_column(Numeric(18, 6), default=0.0)
     total_runtime_hours: Mapped[float] = mapped_column(Float, default=0.0)
     idle_time_hours: Mapped[float] = mapped_column(Float, default=0.0)
     is_idle: Mapped[bool] = mapped_column(Boolean, default=False)

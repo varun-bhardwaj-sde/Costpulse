@@ -3,7 +3,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, Float, Integer, String, func
+from sqlalchemy import DateTime, Integer, Numeric, String, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -17,7 +17,7 @@ class JobRun(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     job_id: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
-    run_id: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    run_id: Mapped[str] = mapped_column(String(255), nullable=False)
     job_name: Mapped[str] = mapped_column(String(255), nullable=True)
     workspace_id: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     creator_email: Mapped[str] = mapped_column(String(255), nullable=True, index=True)
@@ -28,9 +28,11 @@ class JobRun(Base):
     start_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
     end_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
     duration_seconds: Mapped[int] = mapped_column(Integer, default=0)
-    dbu_consumed: Mapped[float] = mapped_column(Float, default=0.0)
-    cost_usd: Mapped[float] = mapped_column(Float, default=0.0)
+    dbu_consumed: Mapped[float] = mapped_column(Numeric(18, 6), default=0.0)
+    cost_usd: Mapped[float] = mapped_column(Numeric(18, 6), default=0.0)
     num_tasks: Mapped[int] = mapped_column(Integer, default=1)
     tags: Mapped[dict] = mapped_column(JSONB, default=dict)
     schedule: Mapped[str] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    __table_args__ = (UniqueConstraint("workspace_id", "run_id", name="uq_job_runs_workspace_run"),)

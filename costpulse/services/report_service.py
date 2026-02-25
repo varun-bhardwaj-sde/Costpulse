@@ -19,6 +19,9 @@ logger = structlog.get_logger()
 
 REPORTS_DIR = os.environ.get("REPORTS_DIR", "/tmp/costpulse_reports")
 
+ALLOWED_REPORT_TYPES = {"showback", "chargeback", "executive", "team"}
+ALLOWED_FORMATS = {"csv", "excel", "pdf"}
+
 
 class ReportService:
     """Generate showback, chargeback, and executive cost reports."""
@@ -46,6 +49,11 @@ class ReportService:
         Returns:
             Report record with file path
         """
+        if report_type not in ALLOWED_REPORT_TYPES:
+            raise ValueError(f"Invalid report_type: {report_type}")
+        if format not in ALLOWED_FORMATS:
+            raise ValueError(f"Invalid format: {format}")
+
         report = Report(
             name=f"{report_type.title()} Report {period_start.strftime('%Y-%m')}",
             report_type=report_type,
