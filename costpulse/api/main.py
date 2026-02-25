@@ -51,7 +51,9 @@ app.include_router(teams.router, prefix="/api/v1/teams", tags=["Teams"])
 app.include_router(allocations.router, prefix="/api/v1/allocations", tags=["Allocations"])
 app.include_router(alerts.router, prefix="/api/v1/alerts", tags=["Alerts"])
 app.include_router(reports.router, prefix="/api/v1/reports", tags=["Reports"])
-app.include_router(recommendations.router, prefix="/api/v1/recommendations", tags=["Recommendations"])
+app.include_router(
+    recommendations.router, prefix="/api/v1/recommendations", tags=["Recommendations"]
+)
 app.include_router(forecasts.router, prefix="/api/v1/forecasts", tags=["Forecasts"])
 app.include_router(tags.router, prefix="/api/v1/tags", tags=["Tags"])
 app.include_router(clusters.router, prefix="/api/v1/clusters", tags=["Clusters"])

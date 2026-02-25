@@ -26,9 +26,7 @@ class AlertService:
         Returns:
             List of triggered alerts
         """
-        result = await self.session.execute(
-            select(Alert).where(Alert.is_active.is_(True))
-        )
+        result = await self.session.execute(select(Alert).where(Alert.is_active.is_(True)))
         alerts = result.scalars().all()
 
         triggered = []
@@ -48,15 +46,17 @@ class AlertService:
                 sent = await self._send_notifications(alert, current_value, message)
                 history.notification_sent = sent
 
-                triggered.append({
-                    "alert_id": str(alert.id),
-                    "alert_name": alert.name,
-                    "alert_type": alert.alert_type,
-                    "current_value": current_value,
-                    "threshold": alert.threshold_value,
-                    "message": message,
-                    "notifications_sent": sent,
-                })
+                triggered.append(
+                    {
+                        "alert_id": str(alert.id),
+                        "alert_name": alert.name,
+                        "alert_type": alert.alert_type,
+                        "current_value": current_value,
+                        "threshold": alert.threshold_value,
+                        "message": message,
+                        "notifications_sent": sent,
+                    }
+                )
 
         if triggered:
             await self.session.flush()
@@ -83,9 +83,7 @@ class AlertService:
         now = datetime.now(timezone.utc)
         month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
-        query = select(func.sum(CostRecord.cost_usd)).where(
-            CostRecord.usage_date >= month_start
-        )
+        query = select(func.sum(CostRecord.cost_usd)).where(CostRecord.usage_date >= month_start)
         if alert.workspace_id:
             query = query.where(CostRecord.workspace_id == alert.workspace_id)
 
@@ -102,14 +100,16 @@ class AlertService:
                 return (
                     True,
                     current_spend,
-                    f"Monthly spend ${current_spend:,.2f} has reached {pct_used:.0f}% of ${budget:,.2f} budget",
+                    f"Monthly spend ${current_spend:,.2f} has reached "
+                    f"{pct_used:.0f}% of ${budget:,.2f} budget",
                 )
         else:
             if current_spend >= alert.threshold_value:
                 return (
                     True,
                     current_spend,
-                    f"Monthly spend ${current_spend:,.2f} exceeds threshold ${alert.threshold_value:,.2f}",
+                    f"Monthly spend ${current_spend:,.2f} exceeds "
+                    f"threshold ${alert.threshold_value:,.2f}",
                 )
 
         return False, current_spend, ""
@@ -122,9 +122,7 @@ class AlertService:
 
         # Today's cost
         today_result = await self.session.execute(
-            select(func.sum(CostRecord.cost_usd)).where(
-                CostRecord.usage_date >= today_start
-            )
+            select(func.sum(CostRecord.cost_usd)).where(CostRecord.usage_date >= today_start)
         )
         today_cost = today_result.scalar() or 0.0
 
@@ -144,7 +142,9 @@ class AlertService:
                 return (
                     True,
                     today_cost,
-                    f"Cost spike detected: ${today_cost:,.2f} today vs ${yesterday_cost:,.2f} yesterday ({pct_change:+.1f}%)",
+                    f"Cost spike detected: ${today_cost:,.2f} today "
+                    f"vs ${yesterday_cost:,.2f} yesterday "
+                    f"({pct_change:+.1f}%)",
                 )
 
         return False, today_cost, ""
@@ -155,9 +155,7 @@ class AlertService:
         today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
 
         result = await self.session.execute(
-            select(func.sum(CostRecord.cost_usd)).where(
-                CostRecord.usage_date >= today_start
-            )
+            select(func.sum(CostRecord.cost_usd)).where(CostRecord.usage_date >= today_start)
         )
         daily_cost = result.scalar() or 0.0
 
@@ -202,12 +200,14 @@ class AlertService:
         """Send Slack notification."""
         try:
             import os
+
             webhook_url = os.environ.get("SLACK_WEBHOOK_URL")
             if not webhook_url:
                 logger.warning("Slack webhook URL not configured")
                 return False
 
             from slack_sdk.webhook import WebhookClient
+
             client = WebhookClient(webhook_url)
             response = client.send(
                 text=f":rotating_light: *CostPulse Alert: {alert.name}*\n{message}",
@@ -228,7 +228,10 @@ class AlertService:
                         "elements": [
                             {
                                 "type": "mrkdwn",
-                                "text": f"Alert type: {alert.alert_type} | Team: {alert.team_id or 'All'}",
+                                "text": (
+                                    f"Alert type: {alert.alert_type}"
+                                    f" | Team: {alert.team_id or 'All'}"
+                                ),
                             }
                         ],
                     },

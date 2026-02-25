@@ -58,7 +58,9 @@ class AlertHistory(Base):
         DateTime(timezone=True), server_default=func.now()
     )
     resolved_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
-    status: Mapped[str] = mapped_column(String(50), default="triggered")  # triggered, resolved, acknowledged
+    status: Mapped[str] = mapped_column(
+        String(50), default="triggered"
+    )  # triggered, resolved, acknowledged
     current_value: Mapped[float] = mapped_column(Float, nullable=True)
     message: Mapped[str] = mapped_column(Text, nullable=True)
     notification_sent: Mapped[dict] = mapped_column(JSONB, default=dict)

@@ -1,6 +1,5 @@
 """Tests for API endpoint schemas and routing."""
 
-import pytest
 from costpulse.api.main import app
 
 

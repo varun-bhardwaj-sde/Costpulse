@@ -1,7 +1,6 @@
 """Report generation service for showback/chargeback reports."""
 
 import csv
-import io
 import os
 import uuid
 from datetime import datetime
@@ -176,14 +175,16 @@ class ReportService:
                 )
             )
             for alloc, team in alloc_result.all():
-                team_data.append({
-                    "team": team.name,
-                    "department": team.department,
-                    "cost_center": team.cost_center,
-                    "total_cost": alloc.total_cost,
-                    "dbu_cost": alloc.dbu_cost,
-                    "compute_cost": alloc.compute_cost,
-                })
+                team_data.append(
+                    {
+                        "team": team.name,
+                        "department": team.department,
+                        "cost_center": team.cost_center,
+                        "total_cost": alloc.total_cost,
+                        "dbu_cost": alloc.dbu_cost,
+                        "compute_cost": alloc.compute_cost,
+                    }
+                )
 
         # Daily trend
         daily_result = await self.session.execute(
@@ -224,7 +225,9 @@ class ReportService:
 
             # Summary section
             writer.writerow(["CostPulse Cost Report"])
-            writer.writerow(["Period", data["summary"]["period_start"], data["summary"]["period_end"]])
+            writer.writerow(
+                ["Period", data["summary"]["period_start"], data["summary"]["period_end"]]
+            )
             writer.writerow(["Total Cost (USD)", f"${data['summary']['total_cost']:,.2f}"])
             writer.writerow(["Total DBUs", f"{data['summary']['total_dbu']:,.0f}"])
             writer.writerow([])
@@ -253,16 +256,20 @@ class ReportService:
             if data.get("by_team"):
                 writer.writerow([])
                 writer.writerow(["Team Cost Allocations"])
-                writer.writerow(["Team", "Department", "Cost Center", "Total Cost", "DBU Cost", "Compute Cost"])
+                writer.writerow(
+                    ["Team", "Department", "Cost Center", "Total Cost", "DBU Cost", "Compute Cost"]
+                )
                 for team in data["by_team"]:
-                    writer.writerow([
-                        team["team"],
-                        team.get("department", ""),
-                        team.get("cost_center", ""),
-                        f"${team['total_cost']:,.2f}",
-                        f"${team['dbu_cost']:,.2f}",
-                        f"${team['compute_cost']:,.2f}",
-                    ])
+                    writer.writerow(
+                        [
+                            team["team"],
+                            team.get("department", ""),
+                            team.get("cost_center", ""),
+                            f"${team['total_cost']:,.2f}",
+                            f"${team['dbu_cost']:,.2f}",
+                            f"${team['compute_cost']:,.2f}",
+                        ]
+                    )
 
     def _generate_excel(self, data: Dict, file_path: str) -> None:
         """Generate Excel report using pandas."""

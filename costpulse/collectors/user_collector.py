@@ -28,14 +28,16 @@ class UserCollector(BaseCollector):
                 if user.groups:
                     groups = [g.display for g in user.groups if g.display]
 
-                users_data.append({
-                    "type": "user",
-                    "id": user.id,
-                    "user_name": user.user_name,
-                    "display_name": user.display_name or user.user_name,
-                    "active": user.active if hasattr(user, "active") else True,
-                    "groups": groups,
-                })
+                users_data.append(
+                    {
+                        "type": "user",
+                        "id": user.id,
+                        "user_name": user.user_name,
+                        "display_name": user.display_name or user.user_name,
+                        "active": user.active if hasattr(user, "active") else True,
+                        "groups": groups,
+                    }
+                )
 
             # Collect groups
             try:
@@ -44,17 +46,17 @@ class UserCollector(BaseCollector):
                     members = []
                     if group.members:
                         members = [
-                            {"id": m.value, "display": m.display}
-                            for m in group.members
-                            if m.value
+                            {"id": m.value, "display": m.display} for m in group.members if m.value
                         ]
 
-                    users_data.append({
-                        "type": "group",
-                        "id": group.id,
-                        "display_name": group.display_name,
-                        "members": members,
-                    })
+                    users_data.append(
+                        {
+                            "type": "group",
+                            "id": group.id,
+                            "display_name": group.display_name,
+                            "members": members,
+                        }
+                    )
             except Exception as e:
                 logger.warning("Could not collect groups", error=str(e))
 
@@ -105,18 +107,22 @@ class UserCollector(BaseCollector):
             for member in members:
                 user = users_map.get(member.get("id", ""))
                 if user:
-                    team_members.append({
-                        "email": user["email"],
-                        "display_name": user["display_name"],
-                        "databricks_user_id": user["databricks_user_id"],
-                    })
+                    team_members.append(
+                        {
+                            "email": user["email"],
+                            "display_name": user["display_name"],
+                            "databricks_user_id": user["databricks_user_id"],
+                        }
+                    )
 
-            teams.append({
-                "team_name": group_name,
-                "members": team_members,
-                "member_count": len(team_members),
-                "source": "databricks_group",
-            })
+            teams.append(
+                {
+                    "team_name": group_name,
+                    "members": team_members,
+                    "member_count": len(team_members),
+                    "source": "databricks_group",
+                }
+            )
 
         # Also include ungrouped users
         grouped_user_ids = set()
@@ -135,11 +141,13 @@ class UserCollector(BaseCollector):
         ]
 
         if ungrouped:
-            teams.append({
-                "team_name": "Unassigned",
-                "members": ungrouped,
-                "member_count": len(ungrouped),
-                "source": "auto_discovery",
-            })
+            teams.append(
+                {
+                    "team_name": "Unassigned",
+                    "members": ungrouped,
+                    "member_count": len(ungrouped),
+                    "source": "auto_discovery",
+                }
+            )
 
         return teams

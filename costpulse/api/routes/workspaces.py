@@ -1,9 +1,8 @@
 """Workspace management API endpoints."""
 
-import uuid
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -74,9 +73,7 @@ async def create_workspace(data: WorkspaceCreate, db: AsyncSession = Depends(get
 @router.get("/{workspace_id}")
 async def get_workspace(workspace_id: str, db: AsyncSession = Depends(get_db)):
     """Get workspace details."""
-    result = await db.execute(
-        select(Workspace).where(Workspace.workspace_id == workspace_id)
-    )
+    result = await db.execute(select(Workspace).where(Workspace.workspace_id == workspace_id))
     workspace = result.scalar_one_or_none()
     if not workspace:
         raise HTTPException(status_code=404, detail="Workspace not found")
@@ -99,9 +96,7 @@ async def update_workspace(
     workspace_id: str, data: WorkspaceUpdate, db: AsyncSession = Depends(get_db)
 ):
     """Update workspace details."""
-    result = await db.execute(
-        select(Workspace).where(Workspace.workspace_id == workspace_id)
-    )
+    result = await db.execute(select(Workspace).where(Workspace.workspace_id == workspace_id))
     workspace = result.scalar_one_or_none()
     if not workspace:
         raise HTTPException(status_code=404, detail="Workspace not found")
@@ -116,9 +111,7 @@ async def update_workspace(
 @router.delete("/{workspace_id}")
 async def delete_workspace(workspace_id: str, db: AsyncSession = Depends(get_db)):
     """Remove a workspace registration."""
-    result = await db.execute(
-        select(Workspace).where(Workspace.workspace_id == workspace_id)
-    )
+    result = await db.execute(select(Workspace).where(Workspace.workspace_id == workspace_id))
     workspace = result.scalar_one_or_none()
     if not workspace:
         raise HTTPException(status_code=404, detail="Workspace not found")

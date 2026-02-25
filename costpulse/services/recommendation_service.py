@@ -1,6 +1,5 @@
 """Recommendation service for idle cluster detection and right-sizing."""
 
-from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List
 
 import structlog
@@ -61,30 +60,33 @@ class RecommendationService:
             idle_hours = cluster.idle_time_hours or 0
             wasted_cost = hourly_cost * idle_hours
 
-            recommendations.append({
-                "recommendation_type": "idle_cluster",
-                "severity": "high" if idle_hours > 2 else "medium",
-                "title": f"Idle cluster: {cluster.cluster_name}",
-                "description": (
-                    f"Cluster '{cluster.cluster_name}' has been idle for {idle_hours:.1f} hours. "
-                    f"Estimated wasted cost: ${wasted_cost:.2f}. "
-                    f"Consider terminating or reducing auto-termination timeout."
-                ),
-                "workspace_id": cluster.workspace_id,
-                "resource_id": cluster.cluster_id,
-                "resource_type": "cluster",
-                "current_cost": wasted_cost,
-                "estimated_savings": wasted_cost * 0.8,
-                "details": {
-                    "cluster_name": cluster.cluster_name,
-                    "idle_hours": idle_hours,
-                    "hourly_cost": hourly_cost,
-                    "node_type": cluster.node_type,
-                    "num_workers": cluster.num_workers,
-                    "action": "terminate",
-                },
-                "status": "open",
-            })
+            recommendations.append(
+                {
+                    "recommendation_type": "idle_cluster",
+                    "severity": "high" if idle_hours > 2 else "medium",
+                    "title": f"Idle cluster: {cluster.cluster_name}",
+                    "description": (
+                        f"Cluster '{cluster.cluster_name}' has been idle "
+                        f"for {idle_hours:.1f} hours. "
+                        f"Estimated wasted cost: ${wasted_cost:.2f}. "
+                        f"Consider terminating or reducing timeout."
+                    ),
+                    "workspace_id": cluster.workspace_id,
+                    "resource_id": cluster.cluster_id,
+                    "resource_type": "cluster",
+                    "current_cost": wasted_cost,
+                    "estimated_savings": wasted_cost * 0.8,
+                    "details": {
+                        "cluster_name": cluster.cluster_name,
+                        "idle_hours": idle_hours,
+                        "hourly_cost": hourly_cost,
+                        "node_type": cluster.node_type,
+                        "num_workers": cluster.num_workers,
+                        "action": "terminate",
+                    },
+                    "status": "open",
+                }
+            )
 
         return recommendations
 
@@ -107,35 +109,39 @@ class RecommendationService:
             if cpu_util < 30 and mem_util < 30 and cluster.num_workers > 1:
                 suggested_workers = max(1, cluster.num_workers // 2)
                 current_hourly = self._estimate_hourly_cost(cluster)
-                estimated_hourly = current_hourly * (suggested_workers + 1) / (cluster.num_workers + 1)
+                estimated_hourly = (
+                    current_hourly * (suggested_workers + 1) / (cluster.num_workers + 1)
+                )
                 monthly_savings = (current_hourly - estimated_hourly) * 24 * 30
 
-                recommendations.append({
-                    "recommendation_type": "right_sizing",
-                    "severity": "medium",
-                    "title": f"Right-size cluster: {cluster.cluster_name}",
-                    "description": (
-                        f"Cluster '{cluster.cluster_name}' is under-utilized "
-                        f"(CPU: {cpu_util:.0f}%, Memory: {mem_util:.0f}%). "
-                        f"Reduce from {cluster.num_workers} to {suggested_workers} workers "
-                        f"to save ~${monthly_savings:.0f}/month."
-                    ),
-                    "workspace_id": cluster.workspace_id,
-                    "resource_id": cluster.cluster_id,
-                    "resource_type": "cluster",
-                    "current_cost": current_hourly * 24 * 30,
-                    "estimated_savings": monthly_savings,
-                    "details": {
-                        "cluster_name": cluster.cluster_name,
-                        "current_workers": cluster.num_workers,
-                        "suggested_workers": suggested_workers,
-                        "avg_cpu": cpu_util,
-                        "avg_memory": mem_util,
-                        "node_type": cluster.node_type,
-                        "action": "resize",
-                    },
-                    "status": "open",
-                })
+                recommendations.append(
+                    {
+                        "recommendation_type": "right_sizing",
+                        "severity": "medium",
+                        "title": f"Right-size cluster: {cluster.cluster_name}",
+                        "description": (
+                            f"Cluster '{cluster.cluster_name}' is under-utilized "
+                            f"(CPU: {cpu_util:.0f}%, Memory: {mem_util:.0f}%). "
+                            f"Reduce from {cluster.num_workers} to {suggested_workers} workers "
+                            f"to save ~${monthly_savings:.0f}/month."
+                        ),
+                        "workspace_id": cluster.workspace_id,
+                        "resource_id": cluster.cluster_id,
+                        "resource_type": "cluster",
+                        "current_cost": current_hourly * 24 * 30,
+                        "estimated_savings": monthly_savings,
+                        "details": {
+                            "cluster_name": cluster.cluster_name,
+                            "current_workers": cluster.num_workers,
+                            "suggested_workers": suggested_workers,
+                            "avg_cpu": cpu_util,
+                            "avg_memory": mem_util,
+                            "node_type": cluster.node_type,
+                            "action": "resize",
+                        },
+                        "status": "open",
+                    }
+                )
 
             # Over-provisioned autoscale
             if (
@@ -145,26 +151,28 @@ class RecommendationService:
                 and cpu_util < 40
             ):
                 suggested_max = max(cluster.autoscale_min, cluster.autoscale_max // 2)
-                recommendations.append({
-                    "recommendation_type": "right_sizing",
-                    "severity": "low",
-                    "title": f"Reduce autoscale max: {cluster.cluster_name}",
-                    "description": (
-                        f"Cluster '{cluster.cluster_name}' has autoscale max of "
-                        f"{cluster.autoscale_max} but typically uses less. "
-                        f"Consider reducing max to {suggested_max}."
-                    ),
-                    "workspace_id": cluster.workspace_id,
-                    "resource_id": cluster.cluster_id,
-                    "resource_type": "cluster",
-                    "estimated_savings": 0,
-                    "details": {
-                        "current_max": cluster.autoscale_max,
-                        "suggested_max": suggested_max,
-                        "action": "adjust_autoscale",
-                    },
-                    "status": "open",
-                })
+                recommendations.append(
+                    {
+                        "recommendation_type": "right_sizing",
+                        "severity": "low",
+                        "title": f"Reduce autoscale max: {cluster.cluster_name}",
+                        "description": (
+                            f"Cluster '{cluster.cluster_name}' has autoscale max of "
+                            f"{cluster.autoscale_max} but typically uses less. "
+                            f"Consider reducing max to {suggested_max}."
+                        ),
+                        "workspace_id": cluster.workspace_id,
+                        "resource_id": cluster.cluster_id,
+                        "resource_type": "cluster",
+                        "estimated_savings": 0,
+                        "details": {
+                            "current_max": cluster.autoscale_max,
+                            "suggested_max": suggested_max,
+                            "action": "adjust_autoscale",
+                        },
+                        "status": "open",
+                    }
+                )
 
         return recommendations
 
@@ -183,44 +191,49 @@ class RecommendationService:
             auto_term = cluster.auto_termination_minutes or 0
 
             if auto_term == 0:
-                recommendations.append({
-                    "recommendation_type": "policy_enforcement",
-                    "severity": "high",
-                    "title": f"No auto-termination: {cluster.cluster_name}",
-                    "description": (
-                        f"Cluster '{cluster.cluster_name}' has no auto-termination configured. "
-                        f"This can lead to runaway costs if the cluster is left idle."
-                    ),
-                    "workspace_id": cluster.workspace_id,
-                    "resource_id": cluster.cluster_id,
-                    "resource_type": "cluster",
-                    "estimated_savings": self._estimate_hourly_cost(cluster) * 8,
-                    "details": {
-                        "cluster_name": cluster.cluster_name,
-                        "suggested_timeout": 30,
-                        "action": "set_auto_termination",
-                    },
-                    "status": "open",
-                })
+                recommendations.append(
+                    {
+                        "recommendation_type": "policy_enforcement",
+                        "severity": "high",
+                        "title": f"No auto-termination: {cluster.cluster_name}",
+                        "description": (
+                            f"Cluster '{cluster.cluster_name}' has no auto-termination configured. "
+                            f"This can lead to runaway costs if the cluster is left idle."
+                        ),
+                        "workspace_id": cluster.workspace_id,
+                        "resource_id": cluster.cluster_id,
+                        "resource_type": "cluster",
+                        "estimated_savings": self._estimate_hourly_cost(cluster) * 8,
+                        "details": {
+                            "cluster_name": cluster.cluster_name,
+                            "suggested_timeout": 30,
+                            "action": "set_auto_termination",
+                        },
+                        "status": "open",
+                    }
+                )
             elif auto_term > 120:
-                recommendations.append({
-                    "recommendation_type": "policy_enforcement",
-                    "severity": "low",
-                    "title": f"Long auto-termination: {cluster.cluster_name}",
-                    "description": (
-                        f"Cluster '{cluster.cluster_name}' has a {auto_term}-minute auto-termination. "
-                        f"Consider reducing to 30-60 minutes."
-                    ),
-                    "workspace_id": cluster.workspace_id,
-                    "resource_id": cluster.cluster_id,
-                    "resource_type": "cluster",
-                    "details": {
-                        "current_timeout": auto_term,
-                        "suggested_timeout": 60,
-                        "action": "reduce_auto_termination",
-                    },
-                    "status": "open",
-                })
+                recommendations.append(
+                    {
+                        "recommendation_type": "policy_enforcement",
+                        "severity": "low",
+                        "title": f"Long auto-termination: {cluster.cluster_name}",
+                        "description": (
+                            f"Cluster '{cluster.cluster_name}' has a "
+                            f"{auto_term}-minute auto-termination. "
+                            f"Consider reducing to 30-60 minutes."
+                        ),
+                        "workspace_id": cluster.workspace_id,
+                        "resource_id": cluster.cluster_id,
+                        "resource_type": "cluster",
+                        "details": {
+                            "current_timeout": auto_term,
+                            "suggested_timeout": 60,
+                            "action": "reduce_auto_termination",
+                        },
+                        "status": "open",
+                    }
+                )
 
         return recommendations
 
@@ -253,9 +266,7 @@ class RecommendationService:
         result = await self.session.execute(query)
         return list(result.scalars().all())
 
-    async def update_recommendation_status(
-        self, rec_id, status: str
-    ) -> Recommendation | None:
+    async def update_recommendation_status(self, rec_id, status: str) -> Recommendation | None:
         """Update recommendation status (e.g., accepted, dismissed)."""
         result = await self.session.execute(
             select(Recommendation).where(Recommendation.id == rec_id)

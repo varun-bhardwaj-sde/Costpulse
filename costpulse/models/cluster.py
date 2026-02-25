@@ -20,9 +20,7 @@ class ClusterInfo(Base):
     cluster_name: Mapped[str] = mapped_column(String(255), nullable=False)
     workspace_id: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     creator_email: Mapped[str] = mapped_column(String(255), nullable=True, index=True)
-    cluster_type: Mapped[str] = mapped_column(
-        String(50), nullable=True
-    )  # all-purpose, job, sql
+    cluster_type: Mapped[str] = mapped_column(String(50), nullable=True)  # all-purpose, job, sql
     state: Mapped[str] = mapped_column(String(50), default="UNKNOWN")
     node_type: Mapped[str] = mapped_column(String(100), nullable=True)
     driver_node_type: Mapped[str] = mapped_column(String(100), nullable=True)
@@ -45,4 +43,3 @@ class ClusterInfo(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
-

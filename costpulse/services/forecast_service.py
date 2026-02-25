@@ -111,9 +111,7 @@ class ForecastService:
             for row in result.all()
         ]
 
-    def _prophet_forecast(
-        self, historical: List[Dict], horizon_days: int
-    ) -> List[Dict[str, Any]]:
+    def _prophet_forecast(self, historical: List[Dict], horizon_days: int) -> List[Dict[str, Any]]:
         """Generate forecast using Facebook Prophet."""
         import pandas as pd
         from prophet import Prophet
@@ -148,9 +146,7 @@ class ForecastService:
             for _, row in future_forecast.iterrows()
         ]
 
-    def _linear_forecast(
-        self, historical: List[Dict], horizon_days: int
-    ) -> List[Dict[str, Any]]:
+    def _linear_forecast(self, historical: List[Dict], horizon_days: int) -> List[Dict[str, Any]]:
         """Simple linear regression forecast as fallback."""
         costs = np.array([h["cost"] for h in historical])
         x = np.arange(len(costs))
@@ -178,24 +174,24 @@ class ForecastService:
             else:
                 forecast_date = datetime.utcnow() + timedelta(days=i)
 
-            forecasts.append({
-                "date": forecast_date,
-                "predicted_cost": float(predicted_cost),
-                "lower_bound": max(0, float(predicted_cost - margin)),
-                "upper_bound": float(predicted_cost + margin),
-                "model": "linear",
-                "metrics": {
-                    "slope": float(slope),
-                    "intercept": float(intercept),
-                    "std_dev": float(std_dev),
-                },
-            })
+            forecasts.append(
+                {
+                    "date": forecast_date,
+                    "predicted_cost": float(predicted_cost),
+                    "lower_bound": max(0, float(predicted_cost - margin)),
+                    "upper_bound": float(predicted_cost + margin),
+                    "model": "linear",
+                    "metrics": {
+                        "slope": float(slope),
+                        "intercept": float(intercept),
+                        "std_dev": float(std_dev),
+                    },
+                }
+            )
 
         return forecasts
 
-    async def get_forecast_summary(
-        self, horizon_days: int = 30
-    ) -> Dict[str, Any]:
+    async def get_forecast_summary(self, horizon_days: int = 30) -> Dict[str, Any]:
         """Get a summary of cost forecasts."""
         result = await self.session.execute(
             select(CostForecast)

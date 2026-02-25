@@ -114,24 +114,28 @@ class CostAllocationService:
             self.session.add(allocation)
 
             team = teams.get(team_id)
-            results.append({
-                "team_id": team_id,
-                "team_name": team.name if team else "Unknown",
-                "total_cost": data["total_cost"],
-                "dbu_cost": data["dbu_cost"],
-                "record_count": data["records"],
-            })
+            results.append(
+                {
+                    "team_id": team_id,
+                    "team_name": team.name if team else "Unknown",
+                    "total_cost": data["total_cost"],
+                    "dbu_cost": data["dbu_cost"],
+                    "record_count": data["records"],
+                }
+            )
 
         # Handle unallocated costs
         if unallocated:
             total_unallocated = sum(r.cost_usd for r in unallocated)
-            results.append({
-                "team_id": None,
-                "team_name": "Unallocated",
-                "total_cost": total_unallocated,
-                "dbu_cost": sum(r.dbu_count * r.dbu_rate for r in unallocated),
-                "record_count": len(unallocated),
-            })
+            results.append(
+                {
+                    "team_id": None,
+                    "team_name": "Unallocated",
+                    "total_cost": total_unallocated,
+                    "dbu_cost": sum(r.dbu_count * r.dbu_rate for r in unallocated),
+                    "record_count": len(unallocated),
+                }
+            )
 
         await self.session.flush()
         logger.info(

@@ -23,22 +23,32 @@ class WarehouseCollector(BaseCollector):
             raw_data = []
 
             for wh in warehouses:
-                raw_data.append({
-                    "id": wh.id,
-                    "name": wh.name,
-                    "state": wh.state.value if wh.state else "UNKNOWN",
-                    "cluster_size": wh.cluster_size,
-                    "min_num_clusters": wh.min_num_clusters or 1,
-                    "max_num_clusters": wh.max_num_clusters or 1,
-                    "auto_stop_mins": wh.auto_stop_mins or 0,
-                    "warehouse_type": wh.warehouse_type.value if wh.warehouse_type else "CLASSIC",
-                    "spot_instance_policy": wh.spot_instance_policy.value if wh.spot_instance_policy else None,
-                    "enable_photon": wh.enable_photon if hasattr(wh, "enable_photon") else False,
-                    "creator_name": wh.creator_name if hasattr(wh, "creator_name") else None,
-                    "num_active_sessions": wh.num_active_sessions if hasattr(wh, "num_active_sessions") else 0,
-                    "num_clusters": wh.num_clusters if hasattr(wh, "num_clusters") else 0,
-                    "tags": {},
-                })
+                raw_data.append(
+                    {
+                        "id": wh.id,
+                        "name": wh.name,
+                        "state": wh.state.value if wh.state else "UNKNOWN",
+                        "cluster_size": wh.cluster_size,
+                        "min_num_clusters": wh.min_num_clusters or 1,
+                        "max_num_clusters": wh.max_num_clusters or 1,
+                        "auto_stop_mins": wh.auto_stop_mins or 0,
+                        "warehouse_type": (
+                            wh.warehouse_type.value if wh.warehouse_type else "CLASSIC"
+                        ),
+                        "spot_instance_policy": (
+                            wh.spot_instance_policy.value if wh.spot_instance_policy else None
+                        ),
+                        "enable_photon": (
+                            wh.enable_photon if hasattr(wh, "enable_photon") else False
+                        ),
+                        "creator_name": wh.creator_name if hasattr(wh, "creator_name") else None,
+                        "num_active_sessions": (
+                            wh.num_active_sessions if hasattr(wh, "num_active_sessions") else 0
+                        ),
+                        "num_clusters": wh.num_clusters if hasattr(wh, "num_clusters") else 0,
+                        "tags": {},
+                    }
+                )
 
             logger.info("Collected warehouses", count=len(raw_data))
             return raw_data
@@ -59,26 +69,25 @@ class WarehouseCollector(BaseCollector):
 
         for wh in data:
             is_serverless = "SERVERLESS" in str(wh.get("warehouse_type", "")).upper()
-            is_idle = (
-                wh.get("state") == "RUNNING"
-                and wh.get("num_active_sessions", 0) == 0
-            )
+            is_idle = wh.get("state") == "RUNNING" and wh.get("num_active_sessions", 0) == 0
 
-            transformed.append({
-                "warehouse_id": wh["id"],
-                "name": wh["name"],
-                "state": wh["state"],
-                "cluster_size": wh.get("cluster_size"),
-                "min_num_clusters": wh.get("min_num_clusters", 1),
-                "max_num_clusters": wh.get("max_num_clusters", 1),
-                "auto_stop_mins": wh.get("auto_stop_mins", 0),
-                "warehouse_type": wh.get("warehouse_type", "CLASSIC"),
-                "is_serverless": is_serverless,
-                "photon_enabled": wh.get("enable_photon", False),
-                "creator": wh.get("creator_name"),
-                "num_active_sessions": wh.get("num_active_sessions", 0),
-                "is_idle": is_idle,
-                "tags": wh.get("tags", {}),
-            })
+            transformed.append(
+                {
+                    "warehouse_id": wh["id"],
+                    "name": wh["name"],
+                    "state": wh["state"],
+                    "cluster_size": wh.get("cluster_size"),
+                    "min_num_clusters": wh.get("min_num_clusters", 1),
+                    "max_num_clusters": wh.get("max_num_clusters", 1),
+                    "auto_stop_mins": wh.get("auto_stop_mins", 0),
+                    "warehouse_type": wh.get("warehouse_type", "CLASSIC"),
+                    "is_serverless": is_serverless,
+                    "photon_enabled": wh.get("enable_photon", False),
+                    "creator": wh.get("creator_name"),
+                    "num_active_sessions": wh.get("num_active_sessions", 0),
+                    "is_idle": is_idle,
+                    "tags": wh.get("tags", {}),
+                }
+            )
 
         return transformed

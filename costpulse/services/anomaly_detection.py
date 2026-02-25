@@ -78,9 +78,7 @@ class AnomalyDetectionService:
         costs = [float(row.daily_cost) for row in rows]
         dates = [row.day for row in rows]
 
-        return self._find_zscore_anomalies(
-            costs, dates, "daily_total", sensitivity
-        )
+        return self._find_zscore_anomalies(costs, dates, "daily_total", sensitivity)
 
     async def _detect_workspace_spikes(
         self, lookback_days: int, sensitivity: float
@@ -178,7 +176,7 @@ class AnomalyDetectionService:
         window = min(7, len(arr) - 1)
 
         for i in range(window, len(arr)):
-            window_data = arr[max(0, i - window):i]
+            window_data = arr[max(0, i - window) : i]
             mean = np.mean(window_data)
             std = np.std(window_data)
 
@@ -189,15 +187,25 @@ class AnomalyDetectionService:
             pct_change = ((arr[i] - mean) / mean * 100) if mean > 0 else 0
 
             if abs(z_score) > sensitivity:
-                anomalies.append({
-                    "dimension": dimension,
-                    "date": dates[i].isoformat() if hasattr(dates[i], "isoformat") else str(dates[i]),
-                    "value": float(arr[i]),
-                    "expected": float(mean),
-                    "z_score": float(z_score),
-                    "pct_change": float(pct_change),
-                    "severity": "critical" if abs(z_score) > 3 else "high" if abs(z_score) > 2.5 else "medium",
-                    "direction": "spike" if z_score > 0 else "drop",
-                })
+                anomalies.append(
+                    {
+                        "dimension": dimension,
+                        "date": (
+                            dates[i].isoformat()
+                            if hasattr(dates[i], "isoformat")
+                            else str(dates[i])
+                        ),
+                        "value": float(arr[i]),
+                        "expected": float(mean),
+                        "z_score": float(z_score),
+                        "pct_change": float(pct_change),
+                        "severity": (
+                            "critical"
+                            if abs(z_score) > 3
+                            else "high" if abs(z_score) > 2.5 else "medium"
+                        ),
+                        "direction": "spike" if z_score > 0 else "drop",
+                    }
+                )
 
         return anomalies

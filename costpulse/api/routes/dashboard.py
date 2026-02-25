@@ -7,8 +7,8 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from costpulse.api.deps import get_db
-from costpulse.models.cost_record import CostRecord
 from costpulse.models.cluster import ClusterInfo
+from costpulse.models.cost_record import CostRecord
 from costpulse.models.recommendation import Recommendation
 
 router = APIRouter()
@@ -44,18 +44,16 @@ async def get_overview(
     prev_cost = previous.scalar() or 0
 
     current_cost = float(current_row.total_cost or 0)
-    cost_change_pct = (
-        ((current_cost - prev_cost) / prev_cost * 100) if prev_cost > 0 else 0
-    )
+    cost_change_pct = ((current_cost - prev_cost) / prev_cost * 100) if prev_cost > 0 else 0
 
     # Active clusters
     active_clusters = await db.execute(
         select(func.count()).select_from(ClusterInfo).where(ClusterInfo.state == "RUNNING")
     )
     idle_clusters = await db.execute(
-        select(func.count()).select_from(ClusterInfo).where(
-            ClusterInfo.state == "RUNNING", ClusterInfo.is_idle.is_(True)
-        )
+        select(func.count())
+        .select_from(ClusterInfo)
+        .where(ClusterInfo.state == "RUNNING", ClusterInfo.is_idle.is_(True))
     )
 
     # Open recommendations

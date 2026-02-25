@@ -74,7 +74,5 @@ class BaseCollector(ABC):
             )
             return transformed
         except Exception as e:
-            logger.error(
-                "Collection failed", collector=self.__class__.__name__, error=str(e)
-            )
+            logger.error("Collection failed", collector=self.__class__.__name__, error=str(e))
             raise

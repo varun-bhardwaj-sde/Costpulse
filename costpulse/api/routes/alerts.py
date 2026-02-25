@@ -9,7 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from costpulse.api.deps import get_db
-from costpulse.models.alert import Alert, AlertHistory
+from costpulse.models.alert import Alert
 from costpulse.services.alert_service import AlertService
 
 router = APIRouter()
@@ -78,9 +78,7 @@ async def create_alert(data: AlertCreate, db: AsyncSession = Depends(get_db)):
 
 
 @router.patch("/{alert_id}")
-async def update_alert(
-    alert_id: uuid.UUID, data: AlertUpdate, db: AsyncSession = Depends(get_db)
-):
+async def update_alert(alert_id: uuid.UUID, data: AlertUpdate, db: AsyncSession = Depends(get_db)):
     """Update an alert configuration."""
     service = AlertService(db)
     alert = await service.update_alert(alert_id, data.model_dump(exclude_unset=True))

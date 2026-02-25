@@ -23,26 +23,34 @@ class ClusterCollector(BaseCollector):
             clusters = list(self.client.clusters.list())
             raw_data = []
             for cluster in clusters:
-                raw_data.append({
-                    "cluster_id": cluster.cluster_id,
-                    "cluster_name": cluster.cluster_name or "unnamed",
-                    "state": cluster.state.value if cluster.state else "UNKNOWN",
-                    "creator_user_name": cluster.creator_user_name,
-                    "node_type_id": cluster.node_type_id,
-                    "driver_node_type_id": cluster.driver_node_type_id or cluster.node_type_id,
-                    "num_workers": cluster.num_workers or 0,
-                    "autoscale": {
-                        "min_workers": cluster.autoscale.min_workers if cluster.autoscale else None,
-                        "max_workers": cluster.autoscale.max_workers if cluster.autoscale else None,
-                    },
-                    "spark_version": cluster.spark_version,
-                    "autotermination_minutes": cluster.autotermination_minutes or 0,
-                    "custom_tags": cluster.custom_tags or {},
-                    "cluster_source": cluster.cluster_source.value if cluster.cluster_source else None,
-                    "last_activity_time": cluster.last_activity_time,
-                    "start_time": cluster.start_time,
-                    "runtime_engine": getattr(cluster, "runtime_engine", None),
-                })
+                raw_data.append(
+                    {
+                        "cluster_id": cluster.cluster_id,
+                        "cluster_name": cluster.cluster_name or "unnamed",
+                        "state": cluster.state.value if cluster.state else "UNKNOWN",
+                        "creator_user_name": cluster.creator_user_name,
+                        "node_type_id": cluster.node_type_id,
+                        "driver_node_type_id": cluster.driver_node_type_id or cluster.node_type_id,
+                        "num_workers": cluster.num_workers or 0,
+                        "autoscale": {
+                            "min_workers": (
+                                cluster.autoscale.min_workers if cluster.autoscale else None
+                            ),
+                            "max_workers": (
+                                cluster.autoscale.max_workers if cluster.autoscale else None
+                            ),
+                        },
+                        "spark_version": cluster.spark_version,
+                        "autotermination_minutes": cluster.autotermination_minutes or 0,
+                        "custom_tags": cluster.custom_tags or {},
+                        "cluster_source": (
+                            cluster.cluster_source.value if cluster.cluster_source else None
+                        ),
+                        "last_activity_time": cluster.last_activity_time,
+                        "start_time": cluster.start_time,
+                        "runtime_engine": getattr(cluster, "runtime_engine", None),
+                    }
+                )
             logger.info("Collected clusters", count=len(raw_data))
             return raw_data
         except Exception as e:
@@ -85,24 +93,26 @@ class ClusterCollector(BaseCollector):
                 cluster_type = "job"
 
             autoscale = cluster.get("autoscale", {})
-            transformed.append({
-                "cluster_id": cluster["cluster_id"],
-                "cluster_name": cluster["cluster_name"],
-                "creator_email": cluster.get("creator_user_name"),
-                "cluster_type": cluster_type,
-                "state": cluster["state"],
-                "node_type": cluster.get("node_type_id"),
-                "driver_node_type": cluster.get("driver_node_type_id"),
-                "num_workers": cluster.get("num_workers", 0),
-                "autoscale_min": autoscale.get("min_workers"),
-                "autoscale_max": autoscale.get("max_workers"),
-                "spark_version": cluster.get("spark_version"),
-                "photon_enabled": photon_enabled,
-                "auto_termination_minutes": cluster.get("autotermination_minutes", 0),
-                "idle_time_hours": idle_minutes / 60,
-                "is_idle": is_idle,
-                "tags": cluster.get("custom_tags", {}),
-                "last_active_at": last_activity,
-            })
+            transformed.append(
+                {
+                    "cluster_id": cluster["cluster_id"],
+                    "cluster_name": cluster["cluster_name"],
+                    "creator_email": cluster.get("creator_user_name"),
+                    "cluster_type": cluster_type,
+                    "state": cluster["state"],
+                    "node_type": cluster.get("node_type_id"),
+                    "driver_node_type": cluster.get("driver_node_type_id"),
+                    "num_workers": cluster.get("num_workers", 0),
+                    "autoscale_min": autoscale.get("min_workers"),
+                    "autoscale_max": autoscale.get("max_workers"),
+                    "spark_version": cluster.get("spark_version"),
+                    "photon_enabled": photon_enabled,
+                    "auto_termination_minutes": cluster.get("autotermination_minutes", 0),
+                    "idle_time_hours": idle_minutes / 60,
+                    "is_idle": is_idle,
+                    "tags": cluster.get("custom_tags", {}),
+                    "last_active_at": last_activity,
+                }
+            )
 
         return transformed

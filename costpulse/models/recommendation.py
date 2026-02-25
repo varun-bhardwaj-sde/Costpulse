@@ -19,7 +19,9 @@ class Recommendation(Base):
     recommendation_type: Mapped[str] = mapped_column(
         String(50), nullable=False, index=True
     )  # idle_cluster, right_sizing, cost_anomaly, policy_enforcement
-    severity: Mapped[str] = mapped_column(String(20), default="medium")  # low, medium, high, critical
+    severity: Mapped[str] = mapped_column(
+        String(20), default="medium"
+    )  # low, medium, high, critical
     title: Mapped[str] = mapped_column(String(512), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
     workspace_id: Mapped[str] = mapped_column(String(255), nullable=True, index=True)

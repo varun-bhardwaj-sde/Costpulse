@@ -1,6 +1,6 @@
 """Unit tests for core constants."""
 
-from costpulse.core.constants import DBU_RATES, VM_COSTS, ANOMALY_THRESHOLDS
+from costpulse.core.constants import ANOMALY_THRESHOLDS, DBU_RATES, VM_COSTS
 
 
 def test_dbu_rates_exist():

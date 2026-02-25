@@ -19,9 +19,7 @@ class CostRecord(Base):
     usage_date: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, index=True
     )
-    workspace_id: Mapped[str] = mapped_column(
-        String(255), nullable=False, index=True
-    )
+    workspace_id: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     sku_name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     cloud: Mapped[str] = mapped_column(String(50), nullable=True)
     usage_unit: Mapped[str] = mapped_column(String(50), default="DBU")

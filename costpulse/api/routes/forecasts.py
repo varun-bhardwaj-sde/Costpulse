@@ -33,7 +33,9 @@ async def generate_forecast(
         "data_points": len(forecasts),
         "data": [
             {
-                "date": f["date"].isoformat() if hasattr(f["date"], "isoformat") else str(f["date"]),
+                "date": (
+                    f["date"].isoformat() if hasattr(f["date"], "isoformat") else str(f["date"])
+                ),
                 "predicted_cost": round(f["predicted_cost"], 2),
                 "lower_bound": round(f["lower_bound"], 2),
                 "upper_bound": round(f["upper_bound"], 2),

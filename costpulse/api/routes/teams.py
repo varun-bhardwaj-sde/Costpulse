@@ -1,7 +1,7 @@
 """Team management API endpoints."""
 
 import uuid
-from typing import List, Optional
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -93,9 +93,7 @@ async def get_team(team_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
 
 
 @router.patch("/{team_id}")
-async def update_team(
-    team_id: uuid.UUID, data: TeamCreate, db: AsyncSession = Depends(get_db)
-):
+async def update_team(team_id: uuid.UUID, data: TeamCreate, db: AsyncSession = Depends(get_db)):
     """Update team details."""
     result = await db.execute(select(Team).where(Team.id == team_id))
     team = result.scalar_one_or_none()

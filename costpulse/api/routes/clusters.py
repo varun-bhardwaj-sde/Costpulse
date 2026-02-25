@@ -68,9 +68,9 @@ async def cluster_summary(db: AsyncSession = Depends(get_db)):
         select(func.count()).select_from(ClusterInfo).where(ClusterInfo.state == "RUNNING")
     )
     idle = await db.execute(
-        select(func.count()).select_from(ClusterInfo).where(
-            ClusterInfo.is_idle.is_(True), ClusterInfo.state == "RUNNING"
-        )
+        select(func.count())
+        .select_from(ClusterInfo)
+        .where(ClusterInfo.is_idle.is_(True), ClusterInfo.state == "RUNNING")
     )
     total_cost = await db.execute(select(func.sum(ClusterInfo.total_cost_usd)))
     total_idle_hours = await db.execute(

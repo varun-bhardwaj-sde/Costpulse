@@ -77,12 +77,11 @@ async def list_allocations(
 
 # Allocation Rules CRUD
 
+
 @router.get("/rules")
 async def list_rules(db: AsyncSession = Depends(get_db)):
     """List all allocation rules."""
-    result = await db.execute(
-        select(AllocationRule).order_by(AllocationRule.priority)
-    )
+    result = await db.execute(select(AllocationRule).order_by(AllocationRule.priority))
     rules = result.scalars().all()
     return {
         "data": [

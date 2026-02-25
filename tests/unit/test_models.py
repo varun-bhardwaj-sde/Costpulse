@@ -1,15 +1,15 @@
 """Tests for database models — verify model schema and table names."""
 
-import pytest
-
 
 class TestWorkspaceModel:
     def test_workspace_table_name(self):
         from costpulse.models.workspace import Workspace
+
         assert Workspace.__tablename__ == "workspaces"
 
     def test_workspace_columns(self):
         from costpulse.models.workspace import Workspace
+
         cols = {c.name for c in Workspace.__table__.columns}
         assert "workspace_id" in cols
         assert "name" in cols
@@ -22,10 +22,12 @@ class TestWorkspaceModel:
 class TestCostRecordModel:
     def test_cost_record_table_name(self):
         from costpulse.models.cost_record import CostRecord
+
         assert CostRecord.__tablename__ == "cost_records"
 
     def test_cost_record_columns(self):
         from costpulse.models.cost_record import CostRecord
+
         cols = {c.name for c in CostRecord.__table__.columns}
         assert "usage_date" in cols
         assert "workspace_id" in cols
@@ -40,6 +42,7 @@ class TestCostRecordModel:
 
     def test_cost_record_indexes(self):
         from costpulse.models.cost_record import CostRecord
+
         index_names = {idx.name for idx in CostRecord.__table__.indexes}
         assert "ix_cost_records_date_workspace" in index_names
         assert "ix_cost_records_date_sku" in index_names
@@ -48,6 +51,7 @@ class TestCostRecordModel:
 class TestTeamModel:
     def test_team_table(self):
         from costpulse.models.team import Team
+
         assert Team.__tablename__ == "teams"
         cols = {c.name for c in Team.__table__.columns}
         assert "name" in cols
@@ -58,6 +62,7 @@ class TestTeamModel:
 
     def test_team_member_table(self):
         from costpulse.models.team import TeamMember
+
         assert TeamMember.__tablename__ == "team_members"
         cols = {c.name for c in TeamMember.__table__.columns}
         assert "team_id" in cols
@@ -68,6 +73,7 @@ class TestTeamModel:
 class TestAllocationModels:
     def test_allocation_rule_table(self):
         from costpulse.models.allocation import AllocationRule
+
         assert AllocationRule.__tablename__ == "allocation_rules"
         cols = {c.name for c in AllocationRule.__table__.columns}
         assert "rule_type" in cols
@@ -76,6 +82,7 @@ class TestAllocationModels:
 
     def test_cost_allocation_table(self):
         from costpulse.models.allocation import CostAllocation
+
         assert CostAllocation.__tablename__ == "cost_allocations"
         cols = {c.name for c in CostAllocation.__table__.columns}
         assert "team_id" in cols
@@ -86,6 +93,7 @@ class TestAllocationModels:
 class TestAlertModel:
     def test_alert_table(self):
         from costpulse.models.alert import Alert
+
         assert Alert.__tablename__ == "alerts"
         cols = {c.name for c in Alert.__table__.columns}
         assert "alert_type" in cols
@@ -95,6 +103,7 @@ class TestAlertModel:
 
     def test_alert_history_table(self):
         from costpulse.models.alert import AlertHistory
+
         assert AlertHistory.__tablename__ == "alert_history"
         cols = {c.name for c in AlertHistory.__table__.columns}
         assert "alert_id" in cols
@@ -105,6 +114,7 @@ class TestAlertModel:
 class TestClusterModel:
     def test_cluster_table(self):
         from costpulse.models.cluster import ClusterInfo
+
         assert ClusterInfo.__tablename__ == "clusters"
         cols = {c.name for c in ClusterInfo.__table__.columns}
         assert "cluster_id" in cols
@@ -120,6 +130,7 @@ class TestClusterModel:
 class TestJobRunModel:
     def test_job_run_table(self):
         from costpulse.models.job import JobRun
+
         assert JobRun.__tablename__ == "job_runs"
         cols = {c.name for c in JobRun.__table__.columns}
         assert "job_id" in cols
@@ -133,6 +144,7 @@ class TestJobRunModel:
 class TestRecommendationModel:
     def test_recommendation_table(self):
         from costpulse.models.recommendation import Recommendation
+
         assert Recommendation.__tablename__ == "recommendations"
         cols = {c.name for c in Recommendation.__table__.columns}
         assert "recommendation_type" in cols
@@ -144,6 +156,7 @@ class TestRecommendationModel:
 class TestReportModel:
     def test_report_table(self):
         from costpulse.models.report import Report
+
         assert Report.__tablename__ == "reports"
         cols = {c.name for c in Report.__table__.columns}
         assert "report_type" in cols
@@ -155,6 +168,7 @@ class TestReportModel:
 class TestForecastModel:
     def test_forecast_table(self):
         from costpulse.models.forecast import CostForecast
+
         assert CostForecast.__tablename__ == "cost_forecasts"
         cols = {c.name for c in CostForecast.__table__.columns}
         assert "forecast_date" in cols
@@ -166,20 +180,7 @@ class TestForecastModel:
 
 class TestAllModelsImportable:
     def test_all_models_import(self):
-        from costpulse.models import (
-            Base,
-            Workspace,
-            CostRecord,
-            Team,
-            TeamMember,
-            AllocationRule,
-            CostAllocation,
-            Alert,
-            AlertHistory,
-            ClusterInfo,
-            JobRun,
-            Recommendation,
-            Report,
-            CostForecast,
-        )
+        import costpulse.models  # noqa: F401 — triggers all model registrations
+        from costpulse.models import Base
+
         assert len(Base.metadata.tables) >= 12

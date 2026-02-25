@@ -96,11 +96,7 @@ class SystemTablesCollector(BaseCollector):
             # Get DBU rate, warn if unknown SKU
             dbu_rate = DBU_RATES.get(sku)
             if dbu_rate is None:
-                logger.warning(
-                    "Unknown SKU using default rate",
-                    sku=sku,
-                    default_rate=0.15
-                )
+                logger.warning("Unknown SKU using default rate", sku=sku, default_rate=0.15)
                 dbu_rate = 0.15  # Default to STANDARD_JOBS_COMPUTE rate
 
             transformed.append(

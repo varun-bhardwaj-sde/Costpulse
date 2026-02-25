@@ -6,7 +6,7 @@ import json
 import os
 import sys
 import time
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 import click
 from rich.console import Console
@@ -37,9 +37,7 @@ def init() -> None:
 
     # Check if .env exists and warn before overwriting
     if os.path.exists(".env"):
-        if not click.confirm(
-            ".env file already exists. Overwrite?", default=False
-        ):
+        if not click.confirm(".env file already exists. Overwrite?", default=False):
             console.print("[yellow]Configuration initialization cancelled.[/yellow]")
             return
 

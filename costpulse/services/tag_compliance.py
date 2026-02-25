@@ -3,7 +3,7 @@
 from typing import Any, Dict, List, Optional
 
 import structlog
-from sqlalchemy import func, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from costpulse.models.cluster import ClusterInfo
@@ -89,14 +89,16 @@ class TagComplianceService:
             if not missing:
                 compliant += 1
             else:
-                violations.append({
-                    "resource_type": "cluster",
-                    "resource_id": cluster.cluster_id,
-                    "resource_name": cluster.cluster_name,
-                    "workspace_id": cluster.workspace_id,
-                    "missing_tags": missing,
-                    "existing_tags": list(tags.keys()),
-                })
+                violations.append(
+                    {
+                        "resource_type": "cluster",
+                        "resource_id": cluster.cluster_id,
+                        "resource_name": cluster.cluster_name,
+                        "workspace_id": cluster.workspace_id,
+                        "missing_tags": missing,
+                        "existing_tags": list(tags.keys()),
+                    }
+                )
 
         return {
             "total": len(clusters),
@@ -136,14 +138,16 @@ class TagComplianceService:
             if not missing:
                 compliant += 1
             else:
-                violations.append({
-                    "resource_type": "cost_record",
-                    "resource_id": record.cluster_id,
-                    "resource_name": record.cluster_name or "unknown",
-                    "workspace_id": record.workspace_id,
-                    "missing_tags": missing,
-                    "existing_tags": list(tags.keys()),
-                })
+                violations.append(
+                    {
+                        "resource_type": "cost_record",
+                        "resource_id": record.cluster_id,
+                        "resource_name": record.cluster_name or "unknown",
+                        "workspace_id": record.workspace_id,
+                        "missing_tags": missing,
+                        "existing_tags": list(tags.keys()),
+                    }
+                )
 
         return {
             "total": len(records),
@@ -197,7 +201,9 @@ class TagComplianceService:
             )
 
         # Find most commonly missing tags
-        all_violations = cluster_compliance.get("violations", []) + cost_compliance.get("violations", [])
+        all_violations = cluster_compliance.get("violations", []) + cost_compliance.get(
+            "violations", []
+        )
         missing_counts: Dict[str, int] = {}
         for v in all_violations:
             for tag in v.get("missing_tags", []):

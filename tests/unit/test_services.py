@@ -4,11 +4,8 @@ import uuid
 from datetime import datetime
 from unittest.mock import MagicMock
 
-import numpy as np
-import pytest
-
 from costpulse.services.anomaly_detection import AnomalyDetectionService
-from costpulse.services.tag_compliance import TagComplianceService, DEFAULT_REQUIRED_TAGS
+from costpulse.services.tag_compliance import DEFAULT_REQUIRED_TAGS, TagComplianceService
 
 
 class TestAnomalyDetection:
@@ -177,8 +174,7 @@ class TestForecastLinearRegression:
 
         service = ForecastService.__new__(ForecastService)
         historical = [
-            {"date": datetime(2026, 1, i + 1), "cost": 1000 + i * 10, "dbu": 100}
-            for i in range(30)
+            {"date": datetime(2026, 1, i + 1), "cost": 1000 + i * 10, "dbu": 100} for i in range(30)
         ]
         forecasts = service._linear_forecast(historical, horizon_days=7)
 
@@ -192,8 +188,7 @@ class TestForecastLinearRegression:
 
         service = ForecastService.__new__(ForecastService)
         historical = [
-            {"date": datetime(2026, 1, i + 1), "cost": 1000.0, "dbu": 100}
-            for i in range(30)
+            {"date": datetime(2026, 1, i + 1), "cost": 1000.0, "dbu": 100} for i in range(30)
         ]
         forecasts = service._linear_forecast(historical, horizon_days=7)
 
