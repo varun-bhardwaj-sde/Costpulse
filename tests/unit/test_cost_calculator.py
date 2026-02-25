@@ -1,6 +1,5 @@
 """Unit tests for cost calculator."""
 
-import pytest
 from decimal import Decimal
 
 from costpulse.processors.cost_calculator import CostCalculator

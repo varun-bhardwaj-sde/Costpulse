@@ -1,8 +1,9 @@
 """Calculate costs from DBU usage."""
 
-import structlog
 from decimal import Decimal
 from typing import Dict, Optional
+
+import structlog
 
 from costpulse.core.constants import DBU_RATES, VM_COSTS
 
@@ -43,11 +44,7 @@ class CostCalculator:
 
         # Get rate with warning for unknown SKUs
         if sku_name not in self.rates:
-            logger.warning(
-                "Unknown SKU using fallback rate",
-                sku=sku_name,
-                fallback_rate=0.15
-            )
+            logger.warning("Unknown SKU using fallback rate", sku=sku_name, fallback_rate=0.15)
         rate = Decimal(str(self.rates.get(sku_name, 0.15)))
         count = Decimal(str(dbu_count))
 
@@ -77,9 +74,7 @@ class CostCalculator:
         """
         # DBU cost
         dbu_per_hour = self._get_dbu_per_hour(sku_name, num_workers, photon_enabled)
-        dbu_cost = self.calculate_dbu_cost(
-            sku_name, dbu_per_hour * runtime_hours, photon_enabled
-        )
+        dbu_cost = self.calculate_dbu_cost(sku_name, dbu_per_hour * runtime_hours, photon_enabled)
 
         # VM cost
         vm_rate = Decimal(str(VM_COSTS.get(cloud, {}).get(node_type, 0)))
@@ -87,9 +82,7 @@ class CostCalculator:
 
         return {"dbu_cost": dbu_cost, "vm_cost": vm_cost, "total_cost": dbu_cost + vm_cost}
 
-    def _get_dbu_per_hour(
-        self, sku_name: str, num_workers: int, photon_enabled: bool
-    ) -> float:
+    def _get_dbu_per_hour(self, sku_name: str, num_workers: int, photon_enabled: bool) -> float:
         """Estimate DBU consumption per hour.
 
         Args:
@@ -134,9 +127,7 @@ class CostCalculator:
         }
 
         base_sku = (
-            "SQL_COMPUTE_SERVERLESS"
-            if "SERVERLESS" in warehouse_type.upper()
-            else "SQL_COMPUTE"
+            "SQL_COMPUTE_SERVERLESS" if "SERVERLESS" in warehouse_type.upper() else "SQL_COMPUTE"
         )
         base_rate = Decimal(str(self.rates.get(base_sku, 0.22)))
 
