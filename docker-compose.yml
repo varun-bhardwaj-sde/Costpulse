@@ -3,9 +3,9 @@ services:
     image: timescale/timescaledb:2.17.2-pg15
     container_name: costpulse-db
     environment:
-      POSTGRES_DB: costpulse
-      POSTGRES_USER: costpulse
-      POSTGRES_PASSWORD: costpulse_dev
+      POSTGRES_DB: ${TIMESCALE_DB:-costpulse}
+      POSTGRES_USER: ${TIMESCALE_USER:-costpulse}
+      POSTGRES_PASSWORD: ${TIMESCALE_PASSWORD:-costpulse_dev}
     ports:
       - "5432:5432"
     volumes:
@@ -42,16 +42,16 @@ services:
       - path: .env
         required: false
     environment:
-      # Defaults for local development — override via .env or shell env
-      TIMESCALE_HOST: timescaledb
-      TIMESCALE_PORT: "5432"
-      TIMESCALE_DB: costpulse
-      TIMESCALE_USER: costpulse
-      TIMESCALE_PASSWORD: costpulse_dev
-      REDIS_URL: redis://redis:6379/0
-      API_HOST: 0.0.0.0
-      API_PORT: "8000"
-      DEBUG: "true"
+      # Shell env and .env values take precedence over these defaults
+      TIMESCALE_HOST: ${TIMESCALE_HOST:-timescaledb}
+      TIMESCALE_PORT: ${TIMESCALE_PORT:-5432}
+      TIMESCALE_DB: ${TIMESCALE_DB:-costpulse}
+      TIMESCALE_USER: ${TIMESCALE_USER:-costpulse}
+      TIMESCALE_PASSWORD: ${TIMESCALE_PASSWORD:-costpulse_dev}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      API_HOST: ${API_HOST:-0.0.0.0}
+      API_PORT: ${API_PORT:-8000}
+      DEBUG: ${DEBUG:-false}
     ports:
       - "8000:8000"
     depends_on:

@@ -7,7 +7,7 @@ This guide walks you through installing, configuring, and running CostPulse for 
 Before you begin, make sure you have:
 
 - **Python 3.10+** installed
-- **Docker and Docker Compose** for running TimescaleDB and Redis
+- **Docker and Docker Compose v2.24.0+** for running TimescaleDB and Redis
 - **A Databricks workspace** with:
   - A personal access token (PAT) or service principal
   - System Tables enabled (for billing data)

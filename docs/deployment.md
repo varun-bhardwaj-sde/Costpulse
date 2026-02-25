@@ -9,7 +9,7 @@ The simplest way to run CostPulse. Suitable for development and teams with a sin
 ### Prerequisites
 
 - Docker Engine 20.10+
-- Docker Compose v2
+- Docker Compose v2.24.0+ (required for optional env_file syntax)
 - 2 GB RAM minimum
 
 ### Steps
