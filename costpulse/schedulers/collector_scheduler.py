@@ -45,7 +45,19 @@ async def run_collection_cycle():
             from costpulse.models.cost_record import CostRecord
 
             for record in billing_data:
-                session.add(CostRecord(**record))
+                session.add(
+                    CostRecord(
+                        usage_date=record["timestamp"],
+                        workspace_id=record.get("workspace_id"),
+                        sku_name=record.get("sku_name"),
+                        cloud=record.get("cloud"),
+                        dbu_count=record.get("dbu_count", 0),
+                        dbu_rate=record.get("dbu_rate", 0),
+                        cost_usd=record.get("cost_usd", 0),
+                        tags=record.get("tags", {}),
+                        metadata_=record.get("metadata", {}),
+                    )
+                )
 
             for cluster in cluster_data:
                 session.add(
